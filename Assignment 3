@@ -1,0 +1,75 @@
+#Popularity of Music Records
+#Problem 1.1 - Understanding the Data
+#Use the read.csv function to load the dataset "songs.csv" into R.
+#How many observations (songs) are from the year 2010?
+
+songs <- read.csv(file.choose())
+table(songs$year)
+
+
+#Problem 1.2 - Understanding the Data
+#How many songs does the dataset include for which the artist name is "Michael Jackson"?
+MJ = subset(songs, artistname == "Michael Jackson")
+str(MJ)
+MJ[c("songtitle","Top10")]
+
+which.max(songs$tempo)
+songs$songtitle[6206]
+
+#Problem 2.1 - Creating Our Prediction Model
+songstrain = subset(songs, year <= 2009)
+songstest = subset(songs, year == 2010)
+
+
+#Problem 2.2 - Creating our Prediction Model
+
+nonvars = c("year", "songtitle", "artistname", "songID", "artistID")
+
+
+SongsTrain = songstrain[ , !(names(songstrain) %in% nonvars) ]
+SongsTest = songstest[ , !(names(songstest) %in% nonvars) ]
+
+
+Model1 = glm(Top10 ~., data = SongsTrain, family = "binomial")
+summary(Model1)
+
+#Problem 2.3 - Creating Our Prediction Model
+
+cor(SongsTrain$loudness, SongsTrain$energy)
+
+#Problem 3.2 - Beware of Multicollinearity Issues!
+
+Model2 = glm(Top10 ~ . - loudness, data = SongsTrain, family = "binomial")
+summary(Model2)
+summary(Model1)
+
+#Problem 3.3 - Beware of Multicollinearity Issues!
+#Now, create Model 3, which should be exactly like Model 1, but without the variable "energy".
+
+Model3 = glm(Top10 ~ . - energy, data = SongsTrain, family = "binomial")
+summary(Model3)
+
+
+#Problem 4.1 - Validating Our Model
+#Make predictions on the test set using Model 3. What is the accuracy of Model 3 on the test set, using a threshold of 0.45? (Compute the accuracy as a number between 0 and 1.)
+
+pred = predict(Model3 , newdata = SongsTest, type = "response")
+table(SongsTest$Top10, pred >= 0.45)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
